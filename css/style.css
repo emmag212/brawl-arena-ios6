@@ -1,0 +1,22 @@
+/* iOS 6 Safari: без flexbox, только абсолютное позиционирование. */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  position: fixed; /* против rubber-band скролла */
+}
+
+#game {
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* размер и центрирование считает main.js в fitScreen() */
+  image-rendering: -webkit-crisp-edges;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
