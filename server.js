@@ -23,6 +23,12 @@ var MIME = {
 http.createServer(function (req, res) {
   var urlPath = decodeURIComponent(req.url.split("?")[0]);
   if (urlPath === "/") urlPath = "/index.html";
+  console.log("[" + req.socket.remoteAddress + "] GET " + req.url.slice(0, 90));
+  if (urlPath === "/beat" || urlPath === "/err") {
+    res.writeHead(200, { "Content-Type": "image/gif" });
+    res.end();
+    return;
+  }
   var filePath = path.join(ROOT, path.normalize(urlPath));
   if (filePath.indexOf(ROOT) !== 0) { res.writeHead(403); res.end(); return; }
   fs.readFile(filePath, function (err, data) {

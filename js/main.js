@@ -164,7 +164,7 @@ BA.frame = function (t) {
     }
   }
   BA.render();
-  window.requestAnimationFrame(BA.frame);
+  BA.raf(BA.frame);
 };
 
 BA.applyInput = function () {
@@ -416,4 +416,31 @@ BA.drawOver = function (ctx) {
 /* ---------- Поехали ---------- */
 BA.fitScreen();
 if (typeof window.__BA === "undefined") window.__BA = BA; // хук для автотестов
-window.requestAnimationFrame(BA.frame);
+
+// iOS 6 знает rAF только с префиксом webkit и требует receiver'ом сам window
+BA.raf = function (cb) {
+  (window.requestAnimationFrame || window.webkitRequestAnimationFrame).call(window, cb);
+};
+
+// #battle — автозапуск боя: удалённая проверка FPS на устройстве
+if (/#battle/.test(location.hash)) BA.startBattle();
+
+// Телеметрия: только при раздаче по http. Игра сама сообщает FPS и ошибки —
+// это единственный способ проверить A5 без скриншотов с устройства.
+if (location.protocol === "http:") {
+  window.onerror = function (msg, src, line) {
+    try {
+      (new Image()).src = "/err?m=" + encodeURIComponent(String(msg).slice(0, 120)) +
+        "&l=" + line + "&r=" + Math.random();
+    } catch (e) {}
+    return false;
+  };
+  setInterval(function () {
+    (new Image()).src = "/beat?state=" + BA.state +
+      "&fps=" + Math.round(BA.fps) +
+      "&alive=" + (BA.battle && BA.battle.player ? (BA.battle.player.alive ? 1 : 0) : "-") +
+      "&t=" + Math.floor(Date.now() / 1000) + "&r=" + Math.random();
+  }, 5000);
+}
+
+BA.raf(BA.frame);
